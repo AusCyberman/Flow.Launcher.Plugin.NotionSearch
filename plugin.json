@@ -1,12 +1,12 @@
 {
     "ID": "3e268e4d-50a7-4847-aa58-adb7b743de1a",
     "ActionKeyword": "n",
-    "Name": "Notion search",
+    "Name": "Notion Search",
     "Description": "Search notion pages and databases",
     "Author": "Duckworth",
     "Version": "0.0.1",
     "Language": "python",
     "Website": "https://github.com/Flow-Launcher/Flow.Launcher.Plugin.HelloWorldPython",
-    "IcoPath": "Images\\app.png",
+    "IcoPath": "Images\\notion-black.svg",
     "ExecuteFileName": "main.py"
 }

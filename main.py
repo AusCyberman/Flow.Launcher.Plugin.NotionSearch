@@ -5,8 +5,8 @@ import logging
 import sys
 import os
 
-from flowlauncher import FlowLauncher
-from notion_client import Client, APIErrorCode, APIResponseError
+from lib.flowlauncher import FlowLauncher
+from lib.notion_client import Client, APIErrorCode, APIResponseError
 
 parent_folder_path = os.path.abspath(os.path.dirname(__file__))
 sys.path.append(parent_folder_path)

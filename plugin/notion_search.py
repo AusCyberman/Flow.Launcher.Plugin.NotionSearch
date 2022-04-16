@@ -12,10 +12,10 @@ from helper import process_result
 class NotionSearch(FlowLauncher):
 
     def query(self, query):
+        settings = self.rpc_request.get("settings", {})
 
         # Get user defined notion token from plugin settings in the flow launcher application
-        NOTION_TOKEN = ""
-
+        NOTION_TOKEN = settings.get("notion_token")
         # Initialize the client with the token
         notion = Client(auth=NOTION_TOKEN)
 

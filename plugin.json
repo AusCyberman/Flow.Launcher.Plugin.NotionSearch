@@ -7,6 +7,6 @@
     "Version": "0.0.2",
     "Language": "python",
     "Website": "https://github.com/Flow-Launcher/Flow.Launcher.Plugin.HelloWorldPython",
-    "IcoPath": "Images\\notion-black.svg",
+    "IcoPath": "Images/notion.png",
     "ExecuteFileName": "main.py"
 }

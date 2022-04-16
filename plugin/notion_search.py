@@ -6,7 +6,7 @@ import requests
 
 from flowlauncher import FlowLauncher
 from notion_client import Client, APIErrorCode, APIResponseError
-from helper import result_processor
+from helper import process_result
 
 
 class NotionSearch(FlowLauncher):
@@ -23,7 +23,7 @@ class NotionSearch(FlowLauncher):
         api_results = notion.search(query=query).get("results")
 
         # Process the results with the helper function
-        return [result_processor(result) for result in api_results]
+        return [process_result(result) for result in api_results]
 
     def context_menu(self, data):
         return [

@@ -9,4 +9,3 @@ body:
       name: notion_token
       label: 'Notion Integration Token'
       description: A notion integration shared with your workspace must be created to get an integration token. See https://www.notion.so/my-integrations.
-      defaultValue: ""

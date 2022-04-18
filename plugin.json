@@ -4,9 +4,9 @@
     "Name": "Notion Search",
     "Description": "Search notion pages and databases",
     "Author": "Duckworth",
-    "Version": "0.0.3",
+    "Version": "0.0.4",
     "Language": "python",
-    "Website": "https://github.com/Flow-Launcher/Flow.Launcher.Plugin.HelloWorldPython",
+    "Website": "https://github.com/danielduckworth/Flow.Launcher.Plugin.NotionSearch",
     "IcoPath": "Images/notion.png",
     "ExecuteFileName": "main.py"
 }

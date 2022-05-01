@@ -17,6 +17,6 @@ Install the plugin in Flow Launcher using the plugin manager hotkey, `pm install
 
 ## References
 
-- [Python Hello World Flow Launcher template](github.com/Flow-Launcher/Flow.Launcher.Plugin.HelloWorldPython).
-- [Unofficial Notion SDK Rewrite in Python, notion-sdk-py](github.com/ramnes/notion-sdk-py.git).
-- [A high level interface and object model for the Notion SDK, Notional](jheddings.github.io/notional/).
+- [Python Hello World Flow Launcher template](https://github.com/Flow-Launcher/Flow.Launcher.Plugin.HelloWorldPython).
+- [Unofficial Notion SDK Rewrite in Python, notion-sdk-py](https://ramnes.github.io/notion-sdk-py/).
+- [A high level interface and object model for the Notion SDK, Notional](https://jheddings.github.io/notional/).

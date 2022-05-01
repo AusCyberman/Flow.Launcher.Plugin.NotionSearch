@@ -1,3 +1,4 @@
 flowlauncher
 requests
 notion-client
+notional

@@ -1,20 +1,18 @@
+import notional
 import webbrowser
 import logging
-import sys
-import os
-import requests
 
 from flowlauncher import FlowLauncher
 from notion_client import Client, APIErrorCode, APIResponseError
-from helper import process_result
+from notional.query import SortDirection, TimestampKind
 
+logging.basicConfig(level=logging.INFO)
 
 class NotionSearch(FlowLauncher):
 
     def query(self, query):
 
         settings = self.rpc_request.get("settings", {})
-
         # Check if the user has set an integration token
         try:
             NOTION_TOKEN = settings.get("notion_token")
@@ -22,7 +20,6 @@ class NotionSearch(FlowLauncher):
                 raise Exception("No token found")
         except Exception as e:
             logging.error(e)
-
             return [{
                 "Title": "Notion integration token not found.",
                 "SubTitle": "Please set the token in the settings of the plugin in the flow launcher application.",
@@ -32,54 +29,57 @@ class NotionSearch(FlowLauncher):
                     "parameters": []
                 }
             }]
-
+        # Check if the integration token is valid
         try:
-            # Initialize the client with the token
             notion = Client(auth=NOTION_TOKEN)
-
-            # Query notion API
             api_results = notion.search(query=query).get("results")
-
-            # If the request has errors, return an error message
-            # TODO: Check if the error is a 404 or a 401 so that empty results can be returned
-            if not api_results:
-                raise Exception("No results returned")
+            # If the request is 'APIResponseError: API token is invalid' raise an exception.
+            if isinstance(api_results, APIResponseError) and api_results.code == APIErrorCode.INVALID_TOKEN:
+                raise Exception("Invalid token")
         except Exception as e:
             logging.error(e)
-
             return [{
-                "Title": "Notion API returned an error.",
-                "SubTitle": "Check that your integration token is valid in the settings of the plugin in the flow launcher application.",
+                "Title": "Invalid Notion token",
+                "SubTitle": "Check the integration token in the settings of the plugin in the flow launcher application.",
                 "IcoPath": "Images/notion.png",
                 "JsonRPCAction": {
                     "method": "Flow.Launcher.OpenSettingDialog",
                     "parameters": []
                 }
             }]
+        # Notional wrapper for the Notion Python SDK
+        auth_token = NOTION_TOKEN
+        notion = notional.connect(auth=auth_token)
+        query = notion.search(query).sort(
+            timestamp=TimestampKind.LAST_EDITED_TIME, direction=SortDirection.ASCENDING
+        )
+        results = []
+        for result in query.execute():
+            title = result.Title
+            url = result.url
+            last_edited_time = result.last_edited_time
+            parent = result.parent
+            results_dict = {"Title": title, "SubTitle": f'Notion TYPE',
+                            "IcoPath": "Images/notion.png", 
+                            "JsonRPCAction": 
+                                {"method": "open_url", "parameters": [url]}}
+            results.append(results_dict)
+        return results
 
-        return [process_result(result) for result in api_results]
 
     def context_menu(self, data):
         return [
             {
-                "Title": "Copy link",
-                "SubTitle": "Press enter to copy the link to this page",
+                "Title": "Placeholder context menu",
+                "SubTitle": "Press enter to visit the GitHub repository for this plugin",
                 "IcoPath": "Images/app.png",
                 "JsonRPCAction": {
                     "method": "open_url",
-                    "parameters": ["https://github.com/Flow-Launcher/Flow.Launcher.Plugin.HelloWorldPython"]
+                    "parameters": ["https://github.com/danielduckworth/Flow.Launcher.Plugin.NotionSearch"]
                 }
             },
-            {
-                "Title": "Open in browser",
-                "SubTitle": "Press enter to open this page in your browser",
-                "IcoPath": "Images/app.png",
-                "JsonRPCAction": {
-                    "method": "open_url",
-                    "parameters": ["https://github.com/Flow-Launcher/Flow.Launcher.Plugin.HelloWorldPython"]
-                }
-            }
         ]
+
 
     def open_url(self, url):
         webbrowser.open(url)

@@ -5,3 +5,4 @@ __pycache__/
 *.code-workspace
 .vscode/
 plugin_dev/
+main_test.py

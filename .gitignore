@@ -1,3 +1,8 @@
 lib/
 __pycache__/
 *.ipynb
+*.env
+*.code-workspace
+.vscode/
+plugin_dev/
+main_test.py

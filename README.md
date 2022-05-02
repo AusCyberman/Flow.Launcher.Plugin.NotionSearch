@@ -6,9 +6,9 @@ Install the plugin in Flow Launcher using the plugin manager hotkey, `pm install
 
 ## Prerequisites
 
-- 🔌[A Notion integration](notion.com/my-integrations) and integration token (**See Notion's docs**: [Create integrations with the Notion API](notion.so/help/create-integrations-with-the-notion-api)).
+- 🔌[A Notion integration](https://www.notion.so/help/create-integrations-with-the-notion-api) and integration token.
 - 👀 The integration needs to be configured with read content permission.
-- 🔑 The integration must be added to at least one page in the Notion work space using the Share settings (**See Notion's docs**: [Add integrations to pages](notion.so/help/add-and-manage-integrations-with-the-api#add-integrations-to-pages)).
+- 🔑 The integration must be [added to at least one page in the Notion work space](https://notion.so/help/add-and-manage-integrations-with-the-api#add-integrations-to-pages) using the Share settings.
 
 ## Feature ideas
 

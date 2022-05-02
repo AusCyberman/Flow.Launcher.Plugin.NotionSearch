@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-NotionSerch
+Notion search for Flow Launcher
 =====
 Search for pages and databases in Notion
 """

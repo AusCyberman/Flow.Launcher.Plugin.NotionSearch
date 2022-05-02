@@ -1,87 +1,60 @@
-import notional
+"""Flow Launcher plugin for Notion"""
+
 import webbrowser
 import logging
-
 from flowlauncher import FlowLauncher
-from notion_client import Client, APIErrorCode, APIResponseError
-from notional.query import SortDirection, TimestampKind
+from notional.session import SessionError
+from . helper import (NOTION_ICON, GITHUB_URL,
+                        error_messages, session_test, results_processor, show_msg)
 
 logging.basicConfig(level=logging.INFO)
 
+
 class NotionSearch(FlowLauncher):
+    """The main class for the plugin"""
 
-    def query(self, query):
+    def search(self, query):
+        """Search method using using the notional package."""
 
-        settings = self.rpc_request.get("settings", {})
-        # Check if the user has set an integration token
+        user_settings = self.rpc_request.get("settings", {})
         try:
-            NOTION_TOKEN = settings.get("notion_token")
-            if not NOTION_TOKEN:
-                raise Exception("No token found")
-        except Exception as e:
-            logging.error(e)
-            return [{
-                "Title": "Notion integration token not found.",
-                "SubTitle": "Please set the token in the settings of the plugin in the flow launcher application.",
-                "IcoPath": "Images/notion.png",
-                "JsonRPCAction": {
-                    "method": "Flow.Launcher.OpenSettingDialog",
-                    "parameters": []
-                }
-            }]
-        # Check if the integration token is valid
+            token = self.settings_test(user_settings)
+        except self.SettingsError as error_message:
+            return show_msg(error_message, "SettingsException")
         try:
-            notion = Client(auth=NOTION_TOKEN)
-            api_results = notion.search(query=query).get("results")
-            # If the request is 'APIResponseError: API token is invalid' raise an exception.
-            if isinstance(api_results, APIResponseError) and api_results.code == APIErrorCode.INVALID_TOKEN:
-                raise Exception("Invalid token")
-        except Exception as e:
-            logging.error(e)
-            return [{
-                "Title": "Invalid Notion token",
-                "SubTitle": "Check the integration token in the settings of the plugin in the flow launcher application.",
-                "IcoPath": "Images/notion.png",
-                "JsonRPCAction": {
-                    "method": "Flow.Launcher.OpenSettingDialog",
-                    "parameters": []
-                }
-            }]
-        # Notional wrapper for the Notion Python SDK
-        auth_token = NOTION_TOKEN
-        notion = notional.connect(auth=auth_token)
-        query = notion.search(query).sort(
-            timestamp=TimestampKind.LAST_EDITED_TIME, direction=SortDirection.ASCENDING
-        )
-        results = []
-        for result in query.execute():
-            title = result.Title
-            url = result.url
-            last_edited_time = result.last_edited_time
-            parent = result.parent
-            results_dict = {"Title": title, "SubTitle": f'Notion TYPE',
-                            "IcoPath": "Images/notion.png", 
-                            "JsonRPCAction": 
-                                {"method": "open_url", "parameters": [url]}}
-            results.append(results_dict)
-        return results
+            client = session_test(token)
+        except SessionError as error_message:
+            return show_msg(error_message, "SessionException")
+        return results_processor(query, client)
 
+    class SettingsError(Exception):
+        """Raised when Notion API token is not found."""
+
+    # Method to test the user's settings
+    def settings_test(self, user_settings):
+        """Check if the user has a token in settings."""
+
+        if "notion_token" in user_settings:
+            logging.info("Integration token found.")
+            return user_settings.get("notion_token")
+        raise self.SettingsError(error_messages["SettingsException"]["SysMsg"])
 
     def context_menu(self, data):
+        """Placeholder for context menu."""
         return [
             {
                 "Title": "Placeholder context menu",
                 "SubTitle": "Press enter to visit the GitHub repository for this plugin",
-                "IcoPath": "Images/app.png",
+                "IcoPath": NOTION_ICON,
                 "JsonRPCAction": {
                     "method": "open_url",
-                    "parameters": ["https://github.com/danielduckworth/Flow.Launcher.Plugin.NotionSearch"]
+                    "parameters": [GITHUB_URL]
                 }
             },
         ]
 
-
     def open_url(self, url):
+        """Open a URL in the default browser."""
         webbrowser.open(url)
 
 

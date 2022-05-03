@@ -1,12 +1,12 @@
 # Notion search Flow Launcher plugin 🔍
 
-The Notion search plugin for Flow Launcher searches for pages and databases in a Notion workspace.
+The Notion search plugin for [Flow Launcher](https://www.flowlauncher.com/) searches for pages and databases in a Notion workspace.
 
 Install the plugin in Flow Launcher using the plugin manager hotkey, `pm install Notion Search`.
 
 ## Prerequisites
 
-- 🔌[A Notion integration](https://www.notion.so/help/create-integrations-with-the-notion-api) and integration token.
+- ⚡[A Notion integration](https://www.notion.so/help/create-integrations-with-the-notion-api) and integration token.
 - 👀 The integration needs to be configured with read content permission.
 - 🔑 The integration must be [added to at least one page in the Notion work space](https://notion.so/help/add-and-manage-integrations-with-the-api#add-integrations-to-pages) using the Share settings.
 

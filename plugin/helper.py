@@ -5,15 +5,17 @@ from datetime import datetime
 import notional
 from notional.query import SortDirection, TimestampKind
 from notional.session import SessionError
-from flowlauncher import FlowLauncherAPI as flow_api
+
 
 NOTION_ICON = "Images/notion.png"
 GITHUB_URL = "https://github.com/danielduckworth/Flow.Launcher.Plugin.NotionSearch"
+NOTION_URL = "https://www.notion.so/help/create-integrations-with-the-notion-api"
+
 
 default_rpc = {
     "Title": "",
     "SubTitle": "",
-    "IcoPath": "",
+    "IcoPath": NOTION_ICON,
     "JsonRPCAction": {
                 "method": "",
                 "parameters": []
@@ -31,7 +33,7 @@ error_messages = {
 }
 
 
-def session_test(token):  # No self-use, hence a function not a method
+def session_test(token):
     """Check if token is accepted by the Notion API."""
 
     client = notional.connect(auth=token)
@@ -41,22 +43,24 @@ def session_test(token):  # No self-use, hence a function not a method
     raise SessionError
 
 
-def show_msg(error_message, arg):  # No self-use, make a function
+def show_msg(error_message, arg):
     """Show error message to the user."""
     logging.error(error_message)
-    flow_api.show_msg(
-        f"{str(error_message)} ☹️", error_messages[arg]["UserMsg"], NOTION_ICON)
-    return None
+    flow_msg = default_rpc.copy()
+    flow_msg["Title"] = f"{str(error_message)} ☹️"
+    flow_msg["SubTitle"] = error_messages[arg]["UserMsg"]
+    return flow_msg
 
 
-def results_processor(query, client):  # No self-use, hence a function not a method
+def results_processor(query, client):
     """Process the raw results from the Notion search."""
 
     data = client.search(query).sort(
         timestamp=TimestampKind.LAST_EDITED_TIME,
         direction=SortDirection.ASCENDING
     )
-    results = []  # Split in to a new method
+    logging.info("Processing results.")
+    results = []
     for result in data.execute():
         obj_type = result.dict()["object"]
         url = result.url
@@ -70,15 +74,16 @@ def results_processor(query, client):  # No self-use, hence a function not a met
         delta = edit_delta(last_edited_time)
         #parent = result.parent
         results_dict = {"Title": f"{title}",
-                        "SubTitle": f"Notion {obj_type} | edited {delta}",
+                        "SubTitle": f"Notion {obj_type} | last edited {delta}",
                         "IcoPath": "Images/notion.png",
                         "JsonRPCAction": {"method": "open_url", "parameters": [url]}}
         results.append(results_dict)
     return results
 
-def edit_delta(last_edited_time: datetime):  # sourcery skip: aware-datetime-for-utc
+
+def edit_delta(last_edited_time: datetime):    # sourcery skip: aware-datetime-for-utc
     """
-    Takes a date time and returns a string representing the time since the last edit.
+    Takes a date time object and returns a string representing the time since the last edit.
     """
 
     last_edited_time = last_edited_time.replace(tzinfo=None)
@@ -87,10 +92,14 @@ def edit_delta(last_edited_time: datetime):  # sourcery skip: aware-datetime-for
     delta_minutes = delta_seconds // 60
     delta_hours = delta_minutes // 60
     delta_days = (time_now - last_edited_time).days
-    if delta_days > 0:
-        return f"{delta_days} days ago."
-    if delta_hours > 0:
-        return f"{delta_hours} hours ago."
-    if delta_minutes > 0:
-        return f"{delta_minutes} minutes ago."
-    return f"{delta_seconds} seconds ago."
+
+    if delta_seconds < 60:
+        return "just now"
+    elif delta_minutes < 60:
+        return f"{delta_minutes} minutes ago"
+    elif delta_hours < 24:
+        return f"{delta_hours} hours ago"
+    elif delta_days < 2:
+        return "yesterday"
+    else:
+        return f"{delta_days} days ago"

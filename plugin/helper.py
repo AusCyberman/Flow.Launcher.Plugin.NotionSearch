@@ -24,11 +24,11 @@ default_rpc = {
 error_messages = {
     "SettingsException": {
         "SysMsg": "Integration token not found",
-        "UserMsg": "Press enter to open the Notion integration settings webpage."
+        "UsrMsg": "Press enter to open the Notion integration settings webpage."
     },
     "SessionException": {
         "SysMsg": "Integration token is invalid",
-        "UserMsg": "Press enter to open Flow Launcher settings."
+        "UsrMsg": "Press enter to open Flow Launcher settings."
     }
 }
 
@@ -45,10 +45,17 @@ def session_test(token):
 
 def show_msg(error_message, arg):
     """Show error message to the user."""
+
     logging.error(error_message)
+
     flow_msg = default_rpc.copy()
     flow_msg["Title"] = f"{str(error_message)} ☹️"
-    flow_msg["SubTitle"] = error_messages[arg]["UserMsg"]
+    flow_msg["SubTitle"] = error_messages[arg]["UsrMsg"]
+    if arg == "SettingsException":
+        flow_msg["JsonRPCAction"]["method"] = "open_url"
+        flow_msg["JsonRPCAction"]["parameters"] = [NOTION_URL]
+    elif arg == "SessionException":
+        flow_msg["JsonRPCAction"]["method"] = "Flow.Launcher.OpenSettingDialog"
     return flow_msg
 
 

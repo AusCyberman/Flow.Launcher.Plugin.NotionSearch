@@ -4,7 +4,7 @@ import webbrowser
 import logging
 from flowlauncher import FlowLauncher
 from notional.session import SessionError
-from . helper import NOTION_ICON, NOTION_URL, GITHUB_URL
+from . helper import NOTION_ICON, GITHUB_URL
 from . helper import error_messages
 from . helper import session_test, results_processor, show_msg
 
@@ -14,7 +14,7 @@ logging.basicConfig(level=logging.INFO)
 class NotionSearch(FlowLauncher):
     """The main class for the plugin"""
 
-    def search(self, query):
+    def query(self, query):
         """Search method using using the notional package."""
 
         user_settings = self.rpc_request.get("settings", {})
@@ -23,28 +23,27 @@ class NotionSearch(FlowLauncher):
             token = self.settings_test(user_settings)
         except self.SettingsError as error_message:
             flow_msg = show_msg(error_message, "SettingsException")
-            flow_msg.update(
-                {"JsonRPCAction": {"method": "open_url"}, "parameters": [NOTION_URL]})
             return flow_msg
         try:  # Check if the token is accepted by the Notion API
             client = session_test(token)
         except SessionError as error_message:
             flow_msg = show_msg(error_message, "SessionException")
-            flow_msg.update(
-                {"JsonRPCAction": {"method": "Flow.Launcher.OpenSettingDialog"}})
             return flow_msg
         return results_processor(query, client)
+
 
     class SettingsError(Exception):
         """Raised when Notion API token is not found."""
 
+
     def settings_test(self, user_settings):
         """Check if the user has a token in settings."""
 
-        if "notion_token" in user_settings:
+        if token := user_settings.get("notion_token"):
             logging.info("Integration token found.")
-            return user_settings.get("notion_token")
+            return token
         raise self.SettingsError(error_messages["SettingsException"]["SysMsg"])
+
 
     def context_menu(self, data):
         """Placeholder for context menu."""
@@ -59,6 +58,7 @@ class NotionSearch(FlowLauncher):
                 }
             },
         ]
+
 
     def open_url(self, url):
         """Open a URL in the default browser."""

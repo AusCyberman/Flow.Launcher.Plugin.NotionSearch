@@ -1,11 +1,12 @@
-"""Flow Launcher plugin for Notion"""
+"""Notion search plugin for Flow Launcher"""
 
 import webbrowser
 import logging
 from flowlauncher import FlowLauncher
 from notional.session import SessionError
-from . helper import (NOTION_ICON, GITHUB_URL,
-                        error_messages, session_test, results_processor, show_msg)
+from . helper import NOTION_ICON, NOTION_URL, GITHUB_URL
+from . helper import error_messages
+from . helper import session_test, results_processor, show_msg
 
 logging.basicConfig(level=logging.INFO)
 
@@ -17,20 +18,26 @@ class NotionSearch(FlowLauncher):
         """Search method using using the notional package."""
 
         user_settings = self.rpc_request.get("settings", {})
-        try:
+
+        try:  # Check if the user has a token in settings
             token = self.settings_test(user_settings)
         except self.SettingsError as error_message:
-            return show_msg(error_message, "SettingsException")
-        try:
+            flow_msg = show_msg(error_message, "SettingsException")
+            flow_msg.update(
+                {"JsonRPCAction": {"method": "open_url"}, "parameters": [NOTION_URL]})
+            return flow_msg
+        try:  # Check if the token is accepted by the Notion API
             client = session_test(token)
         except SessionError as error_message:
-            return show_msg(error_message, "SessionException")
+            flow_msg = show_msg(error_message, "SessionException")
+            flow_msg.update(
+                {"JsonRPCAction": {"method": "Flow.Launcher.OpenSettingDialog"}})
+            return flow_msg
         return results_processor(query, client)
 
     class SettingsError(Exception):
         """Raised when Notion API token is not found."""
 
-    # Method to test the user's settings
     def settings_test(self, user_settings):
         """Check if the user has a token in settings."""
 
@@ -44,7 +51,7 @@ class NotionSearch(FlowLauncher):
         return [
             {
                 "Title": "Placeholder context menu",
-                "SubTitle": "Press enter to visit the GitHub repository for this plugin",
+                "SubTitle": "Press enter to visit the Notion search plugin GitHub repository.",
                 "IcoPath": NOTION_ICON,
                 "JsonRPCAction": {
                     "method": "open_url",

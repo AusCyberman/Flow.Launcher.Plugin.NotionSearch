@@ -56,7 +56,7 @@ def show_msg(error_message, arg):
         flow_msg["JsonRPCAction"]["parameters"] = [NOTION_URL]
     elif arg == "SessionException":
         flow_msg["JsonRPCAction"]["method"] = "Flow.Launcher.OpenSettingDialog"
-    return flow_msg
+    return [flow_msg]
 
 
 def results_processor(query, client):

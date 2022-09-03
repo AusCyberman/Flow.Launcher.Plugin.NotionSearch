@@ -1,3 +1,3 @@
 flowlauncher
 requests
-notional
+git+https://github.com/jheddings/notional@master#egg=notional
